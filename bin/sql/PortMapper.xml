@@ -3,5 +3,65 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="PortMapper">
+	
+    <update id="mergePortSchedule" parameterType="java.util.List">
+		MERGE INTO PORT_SCHEDULE_MST PSM
+		USING (
+			   <foreach collection="list" item="item" open="" close="" index="index" separator="UNION">
+			       SELECT #{item.VOY_NO      , jdbcType=VARCHAR} AS VOY_NO
+			            , #{item.PORT_CD     , jdbcType=VARCHAR} AS PORT_CD
+			            , #{item.TMN_CD      , jdbcType=VARCHAR} AS TMN_CD
+			            , #{item.VSL_NM      , jdbcType=VARCHAR} AS VSL_NM
+			            , #{item.VSL_STTS    , jdbcType=VARCHAR} AS VSL_STTS
+			            , #{item.CUT_OFF_DTM , jdbcType=VARCHAR} AS CUT_OFF_DTM
+			            , #{item.ARV_DTM     , jdbcType=VARCHAR} AS ARV_DTM
+			            , #{item.DPT_DTM     , jdbcType=VARCHAR} AS DPT_DTM
+			            , #{item.CARRIER_NM  , jdbcType=VARCHAR} AS CARRIER_NM
+			            , (
+						   SELECT COUNT(*) AS CNT
+				             FROM PORT_SCHEDULE_MST
+				            WHERE VOY_NO = #{item.VOY_NO , jdbcType=VARCHAR}
+			              ) AS CNT
+			         FROM DUAL
+		       </foreach>
+		      ) SUB
+		   ON (SUB.CNT > 0)
+		 WHEN MATCHED THEN
+		    UPDATE 
+		       SET PSM.VOY_NO      = SUB.VOY_NO
+		         , PSM.PORT_CD     = SUB.PORT_CD
+		         , PSM.TMN_CD      = SUB.TMN_CD
+		         , PSM.VSL_NM      = SUB.VSL_NM
+		         , PSM.VSL_STTS    = SUB.VSL_STTS
+		         , PSM.CUT_OFF_DTM = SUB.CUT_OFF_DTM
+		         , PSM.ARV_DTM     = SUB.ARV_DTM
+		         , PSM.DPT_DTM     = SUB.DPT_DTM
+		         , PSM.CARRIER_NM  = SUB.CARRIER_NM
+		     WHERE PSM.VOY_NO = SUB.VOY_NO     
+		 WHEN NOT MATCHED THEN
+		    INSERT (
+		        PSM.IF_SNO
+		       ,PSM.VOY_NO
+		       ,PSM.PORT_CD
+		       ,PSM.TMN_CD
+		       ,PSM.VSL_NM
+		       ,PSM.VSL_STTS
+		       ,PSM.CUT_OFF_DTM
+		       ,PSM.ARV_DTM
+		       ,PSM.DPT_DTM
+		       ,PSM.CARRIER_NM
+		    ) VALUES (
+		        PORT_IF_SNO_SEQ.NEXTVAL
+		       ,SUB.VOY_NO
+		       ,SUB.PORT_CD
+		       ,SUB.TMN_CD
+		       ,SUB.VSL_NM
+		       ,SUB.VSL_STTS
+		       ,SUB.CUT_OFF_DTM
+		       ,SUB.ARV_DTM
+		       ,SUB.DPT_DTM
+		       ,SUB.CARRIER_NM
+		    )
+    </update>
     
 </mapper>

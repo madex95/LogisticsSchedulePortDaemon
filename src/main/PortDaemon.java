@@ -55,6 +55,8 @@ public class PortDaemon {
         			}
         			
         			// 트렌잭션
+        			portDao.mergePortSchedule(list);
+        			list = new ArrayList<>(); // 초기화
         			
         			// 트렌잭션 후 시간이 지나갈때까지 대기
         			while(flag) {
@@ -63,8 +65,6 @@ public class PortDaemon {
         					flag = false;
         				}
         			}
-        			
-        			list = new ArrayList<>(); // 초기화
         			
             	} 
                 

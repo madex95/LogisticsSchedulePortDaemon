@@ -19,5 +19,16 @@ public class PortDAO {
 			portDao = new PortDAO();
 		return portDao;
 	}
+	
+	public void mergePortSchedule(List<Map<String,Object>> list) {
+		
+		try {
+			SqlSession session = sessionFactory.openSession(true);
+			session.update("PortMapper.mergePortSchedule",list);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
 
 }
