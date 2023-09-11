@@ -33,6 +33,7 @@ public class PortDaemon {
 	        
 	        boolean flag = true;
             while (true) { 
+            	flag = true;
             	now = LocalTime.now();
             	
             	// 매일 08:00에 크롤링
